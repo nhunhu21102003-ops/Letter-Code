@@ -51,51 +51,51 @@
     </div>
 
     <script>
-        let qrCanvas = null;
+    function generate() {
+        const d = document.getElementById('date').value;
+        const p = document.getElementById('pass').value;
+        const m = encodeURIComponent(document.getElementById('msg').value);
+        const f = encodeURIComponent(document.getElementById('falling').value || "Love, Miss You");
 
-        function generate() {
-            const d = document.getElementById('date').value;
-            const p = document.getElementById('pass').value;
-            const m = encodeURIComponent(document.getElementById('msg').value);
-            const f = encodeURIComponent(document.getElementById('falling').value || "Love, Miss You");
+        if(!d || !p || !m) return alert("Điền đủ thông tin nhé!");
 
-            if(!d || !p || !m) return alert("Điền đủ thông tin nhé!");
+        let base = window.location.href.split('?')[0].split('#')[0];
+        if (base.endsWith('index.html')) base = base.replace('index.html', '');
+        if (!base.endsWith('/')) base += '/';
 
-            // Xác định đường dẫn gốc
-            let base = window.location.href.split('?')[0].split('#')[0];
-            if (base.endsWith('index.html')) base = base.replace('index.html', '');
-            if (!base.endsWith('/')) base += '/';
+        const finalUrl = `${base}letter.html?d=${d}&p=${p}&m=${m}&f=${f}`;
 
-            const finalUrl = `${base}letter.html?d=${d}&p=${p}&m=${m}&f=${f}`;
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = "";
 
-            // Xóa mã cũ
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
+        // TẠO MÃ QR VỚI TRÁI TIM Ở GIỮA
+        const el = kjua({
+            render: 'canvas',
+            text: finalUrl,
+            size: 250,
+            fill: '#e91e63', // Màu hồng đậm/đỏ tình yêu
+            back: '#ffffff',
+            rounded: 100,    // Bo tròn các điểm ảnh cho mềm
+            quiet: 2,
+            mode: 'label',   // Chế độ chèn nhãn/hình vào giữa
+            label: '❤',      // Hình trái tim ở giữa
+            labelColor: '#ff0000',
+            fontname: 'Arial',
+            fontcolor: '#e91e63'
+        });
 
-            // Tạo mã QR mới bằng kjua (Màu đỏ, bo tròn)
-            const el = kjua({
-                render: 'canvas',
-                text: finalUrl,
-                size: 200,
-                fill: '#ff0000', // MÀU ĐỎ CHO QR
-                back: '#ffffff',
-                rounded: 100,    // Bo tròn các điểm ảnh cực đại
-                quiet: 2,
-                mode: 'plain'
-            });
+        qrContainer.appendChild(el);
+        document.getElementById('result').style.display = 'block';
+    }
 
-            qrContainer.appendChild(el);
-            qrCanvas = el; // Lưu lại để tải về
-            document.getElementById('result').style.display = 'block';
-        }
-
-        function downloadQR() {
-            if (!qrCanvas) return;
-            const link = document.createElement('a');
-            link.download = 'Ma-QR-Tinh-Yeu.png';
-            link.href = qrCanvas.toDataURL("image/png");
-            link.click();
-        }
-    </script>
+    function downloadQR() {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (!canvas) return;
+        const link = document.createElement('a');
+        link.download = 'Ma-QR-Trai-Tim.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }
+</script>
 </body>
 </html>
