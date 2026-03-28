@@ -121,7 +121,7 @@
             white-space: pre-wrap;
         }
 
-        .spotify-container { margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .spotify-container { margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 152px; }
 
         .close-btn {
             margin-top: 15px; padding: 10px 25px;
@@ -187,20 +187,22 @@
         <div class="letter">
             <div class="letter-content" id="letter-text"></div>
             <div class="spotify-container">
-    <iframe 
-        style="border-radius:12px" 
-        src="https://open.spotify.com/embed/track/3y66li7DIrH7HLKIZzxR5H?utm_source=generator" 
-        width="100%" 
-        height="152" 
-        frameBorder="0" 
-        allowfullscreen="" 
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-        loading="lazy">
-    </iframe>
-</div>
+                <iframe 
+                    style="border-radius:12px" 
+                    src="https://open.spotify.com/embed/track/3y66li7DIrH7HLKIZzxR5H?utm_source=generator" 
+                    width="100%" 
+                    height="152" 
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+                </iframe>
+            </div>
             <button class="close-btn" onclick="closeLetter(event)">Close</button>
         </div>
-    </div> <div class="counter-container">
+    </div> 
+
+    <div class="counter-container">
         <div class="counter-title">Chúng mình đã bên nhau </div>
         <div class="timer" id="timer">Đang tính...</div>
         <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.6;">from <span id="display-date">...</span></div>
@@ -218,10 +220,13 @@
     </div>
 
     <script>
+        // PHẦN ĐỌC DỮ LIỆU TỪ TRANG A
         const urlParams = new URLSearchParams(window.location.search);
         const dateVal = urlParams.get('d') || "2024-05-16";
         const passVal = urlParams.get('p') || "16052024";
         const msgVal = decodeURIComponent(urlParams.get('m') || "Chào bạn!");
+        const fallingVal = decodeURIComponent(urlParams.get('f') || "love"); // Lấy chữ rơi tùy chỉnh
+        const fallArr = fallingVal.split(',').map(t => t.trim());
 
         document.getElementById('letter-text').innerText = msgVal;
         document.getElementById('display-date').innerText = dateVal.split('-').reverse().join('/');
@@ -254,6 +259,7 @@
         passInput.addEventListener("keyup", (e) => { if (e.key === "Enter") checkPassword(); });
         function closeLetter(event) { event.stopPropagation(); document.getElementById('wrapper').classList.remove('open'); }
 
+        // Đếm thời gian
         const startDate = new Date(dateVal + "T00:00:00").getTime();
         function updateTimer() {
             const now = new Date().getTime();
@@ -266,16 +272,18 @@
         }
         setInterval(updateTimer, 1000);
 
+        // PHẦN TẠO CHỮ RƠI TỪ TRANG A
         const container = document.getElementById('falling-container');
         function createFallingItem() {
             const el = document.createElement('div');
-            if (Math.random() < 0.7) {
+            // 60% là rơi tim, 40% là rơi chữ tùy chỉnh
+            if (Math.random() < 0.6) {
                 el.classList.add('heart', Math.random() < 0.5 ? 'red' : 'white');
                 el.innerHTML = '❤';
                 el.style.fontSize = (Math.random() * 15 + 15) + 'px';
             } else {
                 el.classList.add('falling-text');
-                el.innerHTML = "love";
+                el.innerHTML = fallArr[Math.floor(Math.random() * fallArr.length)];
                 el.style.fontSize = (Math.random() * 8 + 18) + 'px';
             }
             el.style.left = Math.random() * 95 + 'vw';
