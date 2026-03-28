@@ -58,10 +58,10 @@
     function updateCount() {
         const msg = document.getElementById('msg').value;
         const count = document.getElementById('charCount');
-        count.innerText = msg.length + "/100";
+        count.innerText = msg.length + "/300";
         
         // Đổi màu đỏ khi sắp hết chữ cho dễ nhìn
-        if (msg.length >= 90) {
+        if (msg.length >= 290) {
             count.style.color = "red";
         } else {
             count.style.color = "#888";
