@@ -70,19 +70,15 @@
 
         // TẠO MÃ QR VỚI TRÁI TIM Ở GIỮA
         const el = kjua({
-            render: 'canvas',
-            text: finalUrl,
-            size: 250,
-            fill: '#e91e63', // Màu hồng đậm/đỏ tình yêu
-            back: '#ffffff',
-            rounded: 100,    // Bo tròn các điểm ảnh cho mềm
-            quiet: 2,
-            mode: 'label',   // Chế độ chèn nhãn/hình vào giữa
-            label: '❤',      // Hình trái tim ở giữa
-            labelColor: '#ff0000',
-            fontname: 'Arial',
-            fontcolor: '#e91e63'
-        });
+    render: 'canvas',
+    text: finalUrl,
+    size: 400,          // Tăng kích thước lên 400 hoặc 500 để các chấm rõ hơn
+    fill: '#e91e63', 
+    back: '#ffffff',
+    rounded: 0,         // QUAN TRỌNG: Để là 0 (hình vuông) khi lời nhắn dài để dễ quét hơn
+    quiet: 4,           // Tăng khoảng trắng xung quanh mã QR
+    mode: 'plain'       // Bỏ hình trái tim ở giữa nếu lời nhắn quá dài để ưu tiên dữ liệu
+});
 
         qrContainer.appendChild(el);
         document.getElementById('result').style.display = 'block';
