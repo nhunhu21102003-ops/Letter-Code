@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Thiệp Tình Yêu</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Thiết kế thiệp ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #e91e63; --light-pink: #fce4ec; --text: #5d4037; }
         body { font-family: 'Quicksand', sans-serif; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { color: var(--pink); text-align: center; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: var(--text); font-size: 0.9rem; }
-        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #f8bbd0; border-radius: 10px; box-sizing: border-box; outline: none; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h2 { color: var(--pink); margin-top: 0; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: var(--text); font-size: 0.9rem; text-align: left; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #f8bbd0; border-radius: 10px; box-sizing: border-box; outline: none; font-family: inherit; }
         input:focus { border-color: var(--pink); }
-        button { width: 100%; margin-top: 20px; padding: 15px; border: none; background: var(--pink); color: white; border-radius: 25px; cursor: pointer; font-weight: bold; }
-        #result { margin-top: 25px; display: none; text-align: center; border-top: 2px dashed #f8bbd0; padding-top: 20px; }
-        #qrcode { display: flex; justify-content: center; margin: 15px 0; }
-        .link-box { background: #f9f9f9; padding: 10px; border-radius: 8px; font-size: 0.8rem; word-break: break-all; color: var(--pink); border: 1px solid #ddd; }
-        .copy-btn { background: #4caf50; margin-top: 10px; }
+        button { width: 100%; margin-top: 20px; padding: 15px; border: none; background: var(--pink); color: white; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #c2185b; }
+        
+        #result { margin-top: 25px; display: none; border-top: 2px dashed #f8bbd0; padding-top: 20px; }
+        #qrcode { display: inline-block; margin: 15px 0; padding: 10px; background: white; border-radius: 15px; }
+        #qrcode img { display: block; margin: 0 auto; }
+        
+        .download-btn { background: #4caf50; margin-top: 10px; }
+        .download-btn:hover { background: #388e3c; }
+        .hint { font-size: 0.8rem; color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -36,17 +41,18 @@
         <label>Chữ rơi (cách nhau bằng dấu phẩy):</label>
         <input type="text" id="falling" placeholder="Yêu em, Nhớ em, <3...">
 
-        <button onclick="generate()">Tạo Link & Mã QR</button>
+        <button onclick="generate()">Tạo Mã QR Trái Tim</button>
 
         <div id="result">
             <div id="qrcode"></div>
-            <div class="link-box" id="linkText"></div>
-            <button class="copy-btn" onclick="copy()">Sao chép Link</button>
+            <p class="hint">Quét mã để xem điều bất ngờ!</p>
+            <button class="download-btn" onclick="downloadQR()">Tải mã QR về máy</button>
         </div>
     </div>
 
     <script>
-        let finalUrl = "";
+        let qrCanvas = null;
+
         function generate() {
             const d = document.getElementById('date').value;
             const p = document.getElementById('pass').value;
@@ -55,22 +61,40 @@
 
             if(!d || !p || !m) return alert("Điền đủ thông tin nhé!");
 
-            // Tự động nhận diện đường dẫn GitHub
+            // Xác định đường dẫn gốc
             let base = window.location.href.split('?')[0].split('#')[0];
             if (base.endsWith('index.html')) base = base.replace('index.html', '');
             if (!base.endsWith('/')) base += '/';
 
-            finalUrl = `${base}letter.html?d=${d}&p=${p}&m=${m}&f=${f}`;
+            const finalUrl = `${base}letter.html?d=${d}&p=${p}&m=${m}&f=${f}`;
 
+            // Xóa mã cũ
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = "";
+
+            // Tạo mã QR mới bằng kjua (Màu đỏ, bo tròn)
+            const el = kjua({
+                render: 'canvas',
+                text: finalUrl,
+                size: 200,
+                fill: '#ff0000', // MÀU ĐỎ CHO QR
+                back: '#ffffff',
+                rounded: 100,    // Bo tròn các điểm ảnh cực đại
+                quiet: 2,
+                mode: 'plain'
+            });
+
+            qrContainer.appendChild(el);
+            qrCanvas = el; // Lưu lại để tải về
             document.getElementById('result').style.display = 'block';
-            document.getElementById('linkText').innerText = finalUrl;
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), { text: finalUrl, width: 150, height: 150 });
         }
 
-        function copy() {
-            navigator.clipboard.writeText(finalUrl);
-            alert("Đã sao chép!");
+        function downloadQR() {
+            if (!qrCanvas) return;
+            const link = document.createElement('a');
+            link.download = 'Ma-QR-Tinh-Yeu.png';
+            link.href = qrCanvas.toDataURL("image/png");
+            link.click();
         }
     </script>
 </body>
