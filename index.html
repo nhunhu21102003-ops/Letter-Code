@@ -74,20 +74,18 @@
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = "";
 
-            // Tạo QR - Để size vừa phải (200) để quét nhạy hơn khi chữ dài
-            const el = kjua({
-                render: 'canvas',
-                text: finalGeneratedUrl,
-                size: 350,
-                fill: '#e91e63',
-                back: '#ffffff',
-                rounded: 80,
-                quiet: 2,
-                mode: 'label',
-                label: '❤',
-                labelColor: '#ff0000'
-            });
-
+            // Tạo QR - Không có hình trái tim ở giữa
+        const el = kjua({
+            render: 'canvas',
+            text: finalGeneratedUrl,
+            size: 350,           // Tăng kích thước một chút cho dễ quét
+            fill: '#e91e63',     // Màu hồng đậm
+            back: '#ffffff',
+            rounded: 0,          // Để là 0 (hình vuông) giúp máy quét đọc chữ dài tốt hơn
+            quiet: 4,            // Tạo khoảng trắng xung quanh mã
+            mode: 'plain'        // Chế độ 'plain' sẽ xóa bỏ hoàn toàn hình ảnh ở giữa
+        });
+            
             qrContainer.appendChild(el);
             document.getElementById('result').style.display = 'block';
         }
