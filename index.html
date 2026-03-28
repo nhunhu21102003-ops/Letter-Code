@@ -54,7 +54,19 @@
 
     <script>
         let finalGeneratedUrl = "";
-
+// 1. Hàm đếm số chữ (Bạn dán ở đây)
+    function updateCount() {
+        const msg = document.getElementById('msg').value;
+        const count = document.getElementById('charCount');
+        count.innerText = msg.length + "/100";
+        
+        // Đổi màu đỏ khi sắp hết chữ cho dễ nhìn
+        if (msg.length >= 90) {
+            count.style.color = "red";
+        } else {
+            count.style.color = "#888";
+        }
+    }
         function generate() {
             const d = document.getElementById('date').value;
             const p = document.getElementById('pass').value;
