@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thiết kế thiệp ❤️</title>
+    <title>Lời yêu thương ❤️</title>
     <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -14,84 +14,99 @@
         label { display: block; margin-top: 15px; font-weight: bold; color: var(--text); font-size: 0.9rem; text-align: left; }
         input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #f8bbd0; border-radius: 10px; box-sizing: border-box; outline: none; font-family: inherit; }
         input:focus { border-color: var(--pink); }
-        button { width: 100%; margin-top: 20px; padding: 15px; border: none; background: var(--pink); color: white; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #c2185b; }
+        
+        button { width: 100%; margin-top: 15px; padding: 12px; border: none; background: var(--pink); color: white; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .download-btn { background: #4caf50; }
+        .copy-btn { background: #2196f3; } /* Màu xanh dương cho nút Copy */
+        button:hover { opacity: 0.9; transform: scale(1.02); }
         
         #result { margin-top: 25px; display: none; border-top: 2px dashed #f8bbd0; padding-top: 20px; }
         #qrcode { display: inline-block; margin: 15px 0; padding: 10px; background: white; border-radius: 15px; }
-        #qrcode img { display: block; margin: 0 auto; }
-        
-        .download-btn { background: #4caf50; margin-top: 10px; }
-        .download-btn:hover { background: #388e3c; }
-        .hint { font-size: 0.8rem; color: #888; margin-top: 10px; }
+        .link-display { background: #f9f9f9; padding: 10px; border-radius: 8px; font-size: 0.75rem; word-break: break-all; color: #888; border: 1px solid #eee; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Thiết kế thiệp ❤️</h2>
+        <h2>Lời yêu thương ❤️</h2>
         <label>Ngày kỷ niệm:</label>
         <input type="date" id="date" value="2024-05-16">
         
         <label>Mật mã mở thư:</label>
         <input type="text" id="pass" placeholder="Ví dụ: 1605">
         
-        <label>Lời nhắn gửi:</label>
+        <label>Lời nhắn gửi (không quá 200 chữ):</label>
         <textarea id="msg" rows="3" placeholder="Lời chúc ngọt ngào..."></textarea>
         
-        <label>Chữ rơi (cách nhau bằng dấu phẩy):</label>
-        <input type="text" id="falling" placeholder="Yêu em, Nhớ em, <3...">
+        <label>Chữ rơi (cách nhau dấu phẩy):</label>
+        <input type="text" id="falling" placeholder="Yêu anh, Thương anh...">
 
-        <button onclick="generate()">Tạo Mã QR Trái Tim</button>
+        <button onclick="generate()">Tạo Mã QR & Link</button>
 
         <div id="result">
             <div id="qrcode"></div>
-            <p class="hint">Quét mã để xem điều bất ngờ!</p>
-            <button class="download-btn" onclick="downloadQR()">Tải mã QR về máy</button>
+            <div class="link-display" id="linkText"></div>
+            
+            <button class="copy-btn" onclick="copyLink()">📋 Sao chép Link gửi người ấy</button>
+            <button class="download-btn" onclick="downloadQR()">💾 Tải mã QR về máy</button>
         </div>
     </div>
 
     <script>
-    function generate() {
-        const d = document.getElementById('date').value;
-        const p = document.getElementById('pass').value;
-        const m = encodeURIComponent(document.getElementById('msg').value);
-        const f = encodeURIComponent(document.getElementById('falling').value || "Love, Miss You");
+        let finalGeneratedUrl = "";
 
-        if(!d || !p || !m) return alert("Điền đủ thông tin nhé!");
+        function generate() {
+            const d = document.getElementById('date').value;
+            const p = document.getElementById('pass').value;
+            const m = encodeURIComponent(document.getElementById('msg').value);
+            const f = encodeURIComponent(document.getElementById('falling').value || "Love, Miss You");
 
-        let base = window.location.href.split('?')[0].split('#')[0];
-        if (base.endsWith('index.html')) base = base.replace('index.html', '');
-        if (!base.endsWith('/')) base += '/';
+            if(!d || !p || !m) return alert("Điền đủ thông tin nhé!");
 
-        const finalUrl = `${base}letter.html?d=${d}&p=${p}&m=${m}&f=${f}`;
+            let base = window.location.href.split('?')[0].split('#')[0];
+            if (base.endsWith('index.html')) base = base.replace('index.html', '');
+            if (!base.endsWith('/')) base += '/';
 
-        const qrContainer = document.getElementById('qrcode');
-        qrContainer.innerHTML = "";
+            finalGeneratedUrl = `${base}letter.html?d=${d}&p=${p}&m=${m}&f=${f}`;
 
-        // TẠO MÃ QR VỚI TRÁI TIM Ở GIỮA
-        const el = kjua({
-    render: 'canvas',
-    text: finalUrl,
-    size: 400,          // Tăng kích thước lên 400 hoặc 500 để các chấm rõ hơn
-    fill: '#e91e63', 
-    back: '#ffffff',
-    rounded: 0,         // QUAN TRỌNG: Để là 0 (hình vuông) khi lời nhắn dài để dễ quét hơn
-    quiet: 4,           // Tăng khoảng trắng xung quanh mã QR
-    mode: 'plain'       // Bỏ hình trái tim ở giữa nếu lời nhắn quá dài để ưu tiên dữ liệu
-});
+            // Hiển thị một đoạn link ngắn cho đẹp
+            document.getElementById('linkText').innerText = finalGeneratedUrl.substring(0, 50) + "...";
 
-        qrContainer.appendChild(el);
-        document.getElementById('result').style.display = 'block';
-    }
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = "";
 
-    function downloadQR() {
-        const canvas = document.querySelector('#qrcode canvas');
-        if (!canvas) return;
-        const link = document.createElement('a');
-        link.download = 'Ma-QR-Trai-Tim.png';
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    }
-</script>
+            // Tạo QR - Để size vừa phải (200) để quét nhạy hơn khi chữ dài
+            const el = kjua({
+                render: 'canvas',
+                text: finalGeneratedUrl,
+                size: 200,
+                fill: '#e91e63',
+                back: '#ffffff',
+                rounded: 80,
+                quiet: 2,
+                mode: 'label',
+                label: '❤',
+                labelColor: '#ff0000'
+            });
+
+            qrContainer.appendChild(el);
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function copyLink() {
+            if (!finalGeneratedUrl) return;
+            navigator.clipboard.writeText(finalGeneratedUrl).then(() => {
+                alert("Đã sao chép link! Giờ bạn có thể gửi cho người ấy rồi nhé. 😘");
+            });
+        }
+
+        function downloadQR() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+            const link = document.createElement('a');
+            link.download = 'Ma-QR-Love.png';
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+    </script>
 </body>
 </html>
