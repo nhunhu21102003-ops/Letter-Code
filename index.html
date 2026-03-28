@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết kế thư tình nhân</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-bg: #fce4ec;
+            --pink-main: #e91e63;
+            --pink-light: #f8bbd0;
+            --text-color: #5d4037;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--pink-bg);
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(233, 30, 99, 0.15);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: var(--pink-main);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--pink-light);
+            border-radius: 12px;
+            box-sizing: border-box;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--pink-main);
+            box-shadow: 0 0 8px rgba(233, 30, 99, 0.2);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: none;
+            background: var(--pink-main);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover {
+            background: #c2185b;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Khu vực hiển thị kết quả */
+        #result-area {
+            margin-top: 30px;
+            display: none;
+            padding-top: 20px;
+            border-top: 2px dashed var(--pink-light);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: white;
+        }
+
+        .link-display {
+            background: #fdf2f5;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--pink-light);
+            word-break: break-all;
+            font-size: 0.85rem;
+            color: var(--pink-main);
+            margin-bottom: 10px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: #4caf50;
+            padding: 10px;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .copy-btn:hover {
+            background: #388e3c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Tạo Thiệp Của Riêng Bạn ❤️</h2>
+    
+    <div class="input-group">
+        <label>Ngày kỷ niệm (Ngày yêu nhau):</label>
+        <input type="date" id="inputDate" value="2024-05-16">
+    </div>
+    
+    <div class="input-group">
+        <label>Mật mã mở thư (ví dụ: 16052024):</label>
+        <input type="text" id="inputPass" placeholder="Nhập mật mã bất kỳ...">
+    </div>
+    
+    <div class="input-group">
+        <label>Lời nhắn gửi (Nội dung thư):</label>
+        <textarea id="inputMsg" rows="4" placeholder="Nhập những lời yêu thương vào đây nè..."></textarea>
+    </div>
+    
+    <button onclick="generateGift()">Tạo Link & Mã QR</button>
+
+    <div id="result-area">
+        <p style="font-weight: bold; color: var(--pink-main);">✨ Đã tạo thành công! ✨</p>
+        
+        <div id="qrcode"></div>
+        
+        <div class="link-display" id="finalLink"></div>
+        <button class="copy-btn" onclick="copyToClipboard()">Sao chép đường dẫn</button>
+        
+        <p style="font-size: 0.75rem; color: #888; margin-top: 15px;">
+            Hãy gửi link này hoặc chụp ảnh QR cho người ấy nhé!
+        </p>
+    </div>
+</div>
+
+<script>
+    let finalUrl = "";
+
+    function generateGift() {
+        const date = document.getElementById('inputDate').value;
+        const pass = document.getElementById('inputPass').value;
+        const msgRaw = document.getElementById('inputMsg').value;
+        
+        if (!date || !pass || !msgRaw) {
+            alert("Bạn ơi, nhập thiếu thông tin rồi kìa! 😘");
+            return;
+        }
+
+        const msgEncoded = encodeURIComponent(msgRaw);
+
+        // --- XỬ LÝ ĐƯỜNG DẪN CHUẨN GITHUB PAGES ---
+        // Lấy đường dẫn gốc của trang hiện tại
+        let baseUrl = window.location.href.split('?')[0].split('#')[0];
+        
+        // Xóa index.html khỏi link nếu có để nối letter.html vào sau dấu /
+        if (baseUrl.endsWith('index.html')) {
+            baseUrl = baseUrl.replace('index.html', '');
+        }
+        if (!baseUrl.endsWith('/')) {
+            baseUrl += '/';
+        }
+
+        // Tạo URL dẫn tới file letter.html (phải cùng thư mục)
+        finalUrl = `${baseUrl}letter.html?d=${date}&p=${pass}&m=${msgEncoded}`;
+
+        // Hiển thị kết quả
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('finalLink').innerText = finalUrl;
+
+        // Xóa mã QR cũ nếu có và tạo mới
+        const qrcodeContainer = document.getElementById('qrcode');
+        qrcodeContainer.innerHTML = "";
+        new QRCode(qrcodeContainer, {
+            text: finalUrl,
+            width: 160,
+            height: 160,
+            colorDark : "#e91e63",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        // Cuộn xuống vùng kết quả cho mượt
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    function copyToClipboard() {
+        if (!finalUrl) return;
+        navigator.clipboard.writeText(finalUrl).then(() => {
+            alert("Đã sao chép link vào bộ nhớ tạm! 💌");
+        }).catch(err => {
+            alert("Lỗi khi sao chép, bạn hãy bôi đen link rồi copy tay nha!");
+        });
+    }
+</script>
+
+</body>
+</html>
