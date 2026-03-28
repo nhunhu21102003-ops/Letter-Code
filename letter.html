@@ -118,7 +118,7 @@
         .letter-content {
             font-family: 'Dancing Script', cursive; font-size: 1.3rem;
             color: var(--text-gray); line-height: 1.6;
-            white-space: pre-wrap; /* Giữ nguyên xuống dòng của người dùng */
+            white-space: pre-wrap;
         }
 
         .spotify-container { margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -140,7 +140,6 @@
 
         .timer { font-size: 1.1rem; font-weight: bold; color: var(--dark-pink); }
 
-        /* MODAL NHẬP MẬT KHẨU */
         #password-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: none;
@@ -185,15 +184,13 @@
             <div class="envelope-quote">“You may be out of my sight, but you’re all I see”</div>
         </div>
         
-       <div class="letter">
-            <div class="letter-content" id="letter-text">
-                </div>
-            
+        <div class="letter">
+            <div class="letter-content" id="letter-text"></div>
             <div class="spotify-container">
                 <iframe 
                     data-testid="embed-iframe" 
                     style="border-radius:12px" 
-                    src="https://open.spotify.com/embed/track/4uLU6hMCBNj0Zkvjbk9p9X" 
+                    src="https://open.spotify.com/embed/track/6UelLqGl0Ki6Y79qS6S68M" 
                     width="100%" 
                     height="352" 
                     frameBorder="0" 
@@ -202,11 +199,9 @@
                     loading="lazy">
                 </iframe>
             </div>
-            
             <button class="close-btn" onclick="closeLetter(event)">Close</button>
         </div>
-
-    <div class="counter-container">
+    </div> <div class="counter-container">
         <div class="counter-title">Chúng mình đã bên nhau </div>
         <div class="timer" id="timer">Đang tính...</div>
         <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.6;">from <span id="display-date">...</span></div>
@@ -224,13 +219,11 @@
     </div>
 
     <script>
-        // --- PHẦN XỬ LÝ DỮ LIỆU TỪ URL ---
         const urlParams = new URLSearchParams(window.location.search);
         const dateVal = urlParams.get('d') || "2024-05-16";
         const passVal = urlParams.get('p') || "16052024";
-        const msgVal = decodeURIComponent(urlParams.get('m') || "Không có nội dung thư nào được nhập.");
+        const msgVal = decodeURIComponent(urlParams.get('m') || "Chào bạn!");
 
-        // Hiển thị ngày và nội dung thư
         document.getElementById('letter-text').innerText = msgVal;
         document.getElementById('display-date').innerText = dateVal.split('-').reverse().join('/');
 
@@ -238,8 +231,7 @@
         const passInput = document.getElementById('password-input');
 
         function handleEnvelopeClick() {
-            const wrapper = document.getElementById('wrapper');
-            if (!wrapper.classList.contains('open')) {
+            if (!document.getElementById('wrapper').classList.contains('open')) {
                 modal.style.display = 'flex';
                 passInput.focus();
             }
@@ -253,21 +245,16 @@
         function checkPassword() {
             if (passInput.value === passVal) {
                 hidePasswordModal();
-                openLetter();
+                document.getElementById('wrapper').classList.add('open');
             } else {
-                alert("Sai mật mã rồi cưng ơi! Thử lại nha 😘");
+                alert("Sai mật mã rồi cưng ơi! 😘");
                 passInput.value = '';
             }
         }
 
-        passInput.addEventListener("keyup", function(event) {
-            if (event.key === "Enter") checkPassword();
-        });
-
-        function openLetter() { document.getElementById('wrapper').classList.add('open'); }
+        passInput.addEventListener("keyup", (e) => { if (e.key === "Enter") checkPassword(); });
         function closeLetter(event) { event.stopPropagation(); document.getElementById('wrapper').classList.remove('open'); }
 
-        // BỘ ĐẾM THỜI GIAN THEO NGÀY ĐÃ NHẬP
         const startDate = new Date(dateVal + "T00:00:00").getTime();
         function updateTimer() {
             const now = new Date().getTime();
@@ -276,25 +263,20 @@
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            document.getElementById("timer").innerHTML = days + " ngày " + hours + " giờ " + minutes + " phút " + seconds + " giây";
+            document.getElementById("timer").innerHTML = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
         }
         setInterval(updateTimer, 1000);
 
-        // HIỆU ỨNG TRÁI TIM RƠI
         const container = document.getElementById('falling-container');
-        const textArray = ["i love u", "miss you", "onlyyou", "forever", "love you"];
-
         function createFallingItem() {
-            const isHeart = Math.random() < 0.7;
             const el = document.createElement('div');
-            if (isHeart) {
-                el.classList.add('heart');
-                el.classList.add(Math.random() < 0.5 ? 'red' : 'white');
+            if (Math.random() < 0.7) {
+                el.classList.add('heart', Math.random() < 0.5 ? 'red' : 'white');
                 el.innerHTML = '❤';
                 el.style.fontSize = (Math.random() * 15 + 15) + 'px';
             } else {
                 el.classList.add('falling-text');
-                el.innerHTML = textArray[Math.floor(Math.random() * textArray.length)];
+                el.innerHTML = "love";
                 el.style.fontSize = (Math.random() * 8 + 18) + 'px';
             }
             el.style.left = Math.random() * 95 + 'vw';
